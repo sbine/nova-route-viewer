@@ -15,7 +15,6 @@ class RouteViewer extends Tool
     public function boot()
     {
         Nova::script('route-viewer', __DIR__.'/../dist/js/tool.js');
-        Nova::style('route-viewer', __DIR__.'/../dist/css/tool.css');
     }
 
     /**
