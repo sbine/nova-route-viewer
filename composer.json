@@ -1,10 +1,12 @@
 {
     "name": "sbine/route-viewer",
-    "description": "A Laravel Nova tool.",
+    "description": "A Laravel Nova tool to view your registered routes.",
     "keywords": [
         "laravel",
-        "nova"
+        "nova",
+        "routes"
     ],
+    "homepage": "https://github.com/sbine/nova-route-viewer",
     "license": "MIT",
     "authors": [
         {
