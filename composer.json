@@ -1,5 +1,5 @@
 {
-    "name": "sbine/nova-route-viewer",
+    "name": "sbine/route-viewer",
     "description": "A Laravel Nova tool.",
     "keywords": [
         "laravel",
