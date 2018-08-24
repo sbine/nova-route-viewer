@@ -75,14 +75,33 @@ export default {
         },
     },
     computed: {
-        routesAsResources() {
+        filteredRoutes() {
+            if (! this.search.length) {
+                return this.routes;
+            }
+
             return this.routes.filter(route => {
                 let regex = new RegExp('(' + this.search + ')','i');
+                let matchesSearch = false;
+
                 for (let key in route) {
-                    return regex.test(route[key]);
+                    if (Array.isArray(route[key])) {
+                        route[key].forEach(property => {
+                            if (regex.test(property)) {
+                                matchesSearch = true;
+                            }
+                        });
+                    }
+                    else if (regex.test(route[key])) {
+                        matchesSearch = true;
+                    }
                 }
-                return Object.values(route)
-            }).map(route => {
+
+                return matchesSearch;
+            });
+        },
+        routesAsResources() {
+            return this.filteredRoutes.map(route => {
                 return {
                     fields: [
                         {
