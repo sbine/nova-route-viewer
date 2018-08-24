@@ -2,26 +2,135 @@
     <div>
         <heading class="mb-6">Route Viewer</heading>
 
-        <card class="bg-90 flex flex-col items-center justify-center" style="min-height: 300px">
-            <svg class="spin fill-80 mb-6" width="69" height="72" viewBox="0 0 23 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.12 20.455A12.184 12.184 0 0 1 11.5 24a12.18 12.18 0 0 1-9.333-4.319c4.772 3.933 11.88 3.687 16.36-.738a7.571 7.571 0 0 0 0-10.8c-3.018-2.982-7.912-2.982-10.931 0a3.245 3.245 0 0 0 0 4.628 3.342 3.342 0 0 0 4.685 0 1.114 1.114 0 0 1 1.561 0 1.082 1.082 0 0 1 0 1.543 5.57 5.57 0 0 1-7.808 0 5.408 5.408 0 0 1 0-7.714c3.881-3.834 10.174-3.834 14.055 0a9.734 9.734 0 0 1 .03 13.855zM4.472 5.057a7.571 7.571 0 0 0 0 10.8c3.018 2.982 7.912 2.982 10.931 0a3.245 3.245 0 0 0 0-4.628 3.342 3.342 0 0 0-4.685 0 1.114 1.114 0 0 1-1.561 0 1.082 1.082 0 0 1 0-1.543 5.57 5.57 0 0 1 7.808 0 5.408 5.408 0 0 1 0 7.714c-3.881 3.834-10.174 3.834-14.055 0a9.734 9.734 0 0 1-.015-13.87C5.096 1.35 8.138 0 11.5 0c3.75 0 7.105 1.68 9.333 4.319C16.06.386 8.953.632 4.473 5.057z" fill-rule="evenodd"/></svg>
+        <div class="flex justify-between">
+            <div class="relative h-9 flex items-center mb-6">
+                <icon type="search" class="absolute ml-3 text-70" />
 
-            <h1 class="text-white text-4xl text-90 font-light mb-6">
-                We're in a black hole.
-            </h1>
+                <input
+                    class="appearance-none form-control form-input w-search pl-search"
+                    placeholder="Search"
+                    type="search"
+                    v-model="search"
+                >
+            </div>
+        </div>
 
-            <p class="text-white-50% text-lg">
-                You can edit this tool's component at:
-                <code class="ml-1 border border-80 text-sm font-mono text-white bg-black rounded px-2 py-1">/nova-tools/RouteViewer/resources/js/components/Tool.vue</code>
-            </p>
+        <card>
+            <div class="overflow-hidden overflow-x-auto relative">
+                <resource-table
+                    resource-name="routes"
+                    :resources="routesAsResources"
+                    singular-name="route"
+                    ref="resourceTable"
+                    @order="order"
+                />
+            </div>
         </card>
     </div>
 </template>
 
 <script>
+    import {
+        Filterable,
+        Paginatable,
+        PerPageable,
+    } from 'laravel-nova';
+
 export default {
-    mounted() {
-        //
+    mixins: [
+        Filterable,
+        Paginatable,
+        PerPageable,
+    ],
+    data() {
+        return {
+            routes: [],
+            search: '',
+            sortOrder: -1
+        }
     },
+    mounted() {
+        this.getRoutes();
+    },
+    methods: {
+        getRoutes() {
+            Nova.request().get('/nova-vendor/route-viewer/routes').then(response => {
+                this.routes = response.data;
+            })
+        },
+        order(event) {
+            this.sortOrder *= -1;
+
+            this.routes.sort((route1, route2) => {
+                let comparison = 0;
+                if (route1[event.attribute] < route2[event.attribute]) {
+                    comparison = -1;
+                }
+                if (route1[event.attribute] > route2[event.attribute]) {
+                    comparison = 1;
+                }
+
+                return comparison * this.sortOrder;
+            });
+        },
+    },
+    computed: {
+        routesAsResources() {
+            return this.routes.filter(route => {
+                let regex = new RegExp('(' + this.search + ')','i');
+                for (let key in route) {
+                    return regex.test(route[key]);
+                }
+                return Object.values(route)
+            }).map(route => {
+                return {
+                    fields: [
+                        {
+                            indexName: 'Route',
+                            attribute: 'uri',
+                            value: route.uri,
+                            sortable: true,
+                            component: 'text-field',
+                            textAlign: 'left',
+                        },
+                        {
+                            indexName: 'Name',
+                            attribute: 'as',
+                            value: route.as,
+                            sortable: true,
+                            component: 'text-field',
+                            textAlign: 'left',
+                        },
+                        {
+                            indexName: 'Methods',
+                            attribute: 'methods',
+                            value: route.methods,
+                            sortable: true,
+                            component: 'text-field',
+                            textAlign: 'left',
+                        },
+                        {
+                            indexName: 'Action',
+                            attribute: 'action',
+                            value: route.action,
+                            sortable: true,
+                            component: 'text-field',
+                            textAlign: 'left',
+                        },
+                        {
+                            indexName: 'Middleware',
+                            attribute: 'middleware',
+                            value: route.middleware,
+                            sortable: true,
+                            component: 'text-field',
+                            textAlign: 'left',
+                        },
+                    ],
+                    id: [],
+                };
+            });
+        }
+    }
 }
 </script>
 

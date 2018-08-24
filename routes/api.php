@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/endpoint', function (Request $request) {
-//     //
-// });
+Route::get('/routes', function () {
+    $routes = collect(Route::getRoutes())->map(function ($route, $index) {
+        $routeName = $route->action['as'] ?? '';
+        if (ends_with($routeName, '.')) {
+            $routeName = '';
+        }
+
+        return [
+            'uri' => $route->uri,
+            'as' => $routeName,
+            'methods' => $route->methods,
+            'action' => $route->action['uses'],
+            'middleware' => $route->action['middleware'],
+        ];
+    });
+
+    return response()->json($routes);
+});
