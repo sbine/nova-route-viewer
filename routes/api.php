@@ -24,8 +24,8 @@ Route::get('/routes', function () {
             'uri' => $route->uri,
             'as' => $routeName,
             'methods' => $route->methods,
-            'action' => $route->action['uses'],
-            'middleware' => $route->action['middleware'],
+            'action' => $route->action['uses'] ?? '',
+            'middleware' => $route->action['middleware'] ?? [],
         ];
     });
 
