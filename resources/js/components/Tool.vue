@@ -112,8 +112,13 @@ export default {
                 return this.routes;
             }
 
+            const regex = this.searchRegex;
+            // User input is not a valid regular expression, show no results
+            if (! regex) {
+                return {};
+            }
+
             return this.routes.filter(route => {
-                let regex = new RegExp('(' + this.search + ')','i');
                 let matchesSearch = false;
 
                 for (let key in route) {
@@ -131,6 +136,13 @@ export default {
 
                 return matchesSearch;
             });
+        },
+        searchRegex() {
+            try {
+                return new RegExp('(' + this.search + ')','i');
+            } catch (e) {
+                return false;
+            }
         }
     }
 }
