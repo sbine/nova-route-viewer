@@ -17,36 +17,67 @@
 
         <card>
             <div class="overflow-hidden overflow-x-auto relative">
-                <resource-table
-                    resource-name="routes"
-                    :resources="routesAsResources"
-                    singular-name="route"
-                    ref="resourceTable"
-                    @order="order"
-                />
+                <table class="table w-full" cellpadding="0" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th v-for="field in fields" class="text-left">
+                            <sortable-icon
+                                    @sort="sortBy(field)"
+                                    :resource-name="resourceName"
+                                    :uri-key="field.attribute"
+                            >
+                                {{ field.label }}
+                            </sortable-icon>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(route, index) in filteredRoutes" :key="index">
+                        <td v-for="field in fields">
+                            <span class="whitespace-no-wrap text-left">
+                                {{ route[field.attribute] }}
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </card>
     </div>
 </template>
 
 <script>
-    import {
-        Filterable,
-        Paginatable,
-        PerPageable,
-    } from 'laravel-nova';
-
 export default {
-    mixins: [
-        Filterable,
-        Paginatable,
-        PerPageable,
-    ],
     data() {
         return {
+            fields: [
+                {
+                    label: 'Route',
+                    attribute: 'uri',
+                },
+                {
+                    label: 'Name',
+                    attribute: 'as',
+                },
+                {
+                    label: 'Methods',
+                    attribute: 'methods',
+                },
+                {
+                    label: 'Action',
+                    attribute: 'action',
+                },
+                {
+                    label: 'Middleware',
+                    attribute: 'middleware',
+                }
+            ],
             routes: [],
             search: '',
-            sortOrder: -1
+            sort: {
+                field: '',
+                order: -1,
+            },
         }
     },
     mounted() {
@@ -56,21 +87,22 @@ export default {
         getRoutes() {
             Nova.request().get('/nova-vendor/route-viewer/routes').then(response => {
                 this.routes = response.data;
-            })
+            });
         },
-        order(event) {
-            this.sortOrder *= -1;
+        sortBy(field) {
+            this.sort.field = field.attribute;
+            this.sort.order *= -1;
 
             this.routes.sort((route1, route2) => {
                 let comparison = 0;
-                if (route1[event.attribute] < route2[event.attribute]) {
+                if (route1[this.sort.field] < route2[this.sort.field]) {
                     comparison = -1;
                 }
-                if (route1[event.attribute] > route2[event.attribute]) {
+                if (route1[this.sort.field] > route2[this.sort.field]) {
                     comparison = 1;
                 }
 
-                return comparison * this.sortOrder;
+                return comparison * this.sort.order;
             });
         },
     },
@@ -99,60 +131,10 @@ export default {
 
                 return matchesSearch;
             });
-        },
-        routesAsResources() {
-            return this.filteredRoutes.map(route => {
-                return {
-                    fields: [
-                        {
-                            indexName: 'Route',
-                            attribute: 'uri',
-                            value: route.uri,
-                            sortable: true,
-                            component: 'text-field',
-                            textAlign: 'left',
-                        },
-                        {
-                            indexName: 'Name',
-                            attribute: 'as',
-                            value: route.as,
-                            sortable: true,
-                            component: 'text-field',
-                            textAlign: 'left',
-                        },
-                        {
-                            indexName: 'Methods',
-                            attribute: 'methods',
-                            value: route.methods,
-                            sortable: true,
-                            component: 'text-field',
-                            textAlign: 'left',
-                        },
-                        {
-                            indexName: 'Action',
-                            attribute: 'action',
-                            value: route.action,
-                            sortable: true,
-                            component: 'text-field',
-                            textAlign: 'left',
-                        },
-                        {
-                            indexName: 'Middleware',
-                            attribute: 'middleware',
-                            value: route.middleware,
-                            sortable: true,
-                            component: 'text-field',
-                            textAlign: 'left',
-                        },
-                    ],
-                    id: [],
-                };
-            });
         }
     }
 }
 </script>
 
 <style>
-    /* Scoped Styles */
 </style>
