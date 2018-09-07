@@ -13,6 +13,12 @@
                     v-model="search"
                 >
             </div>
+
+            <span class="ml-auto mb-6">
+                <button @click="getRoutes()" class="btn btn-default btn-primary">
+                    Refresh
+                </button>
+            </span>
         </div>
 
         <card>
