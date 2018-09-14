@@ -39,10 +39,25 @@
                     </thead>
                     <tbody>
                     <tr v-for="(route, index) in filteredRoutes" :key="index">
-                        <td v-for="field in fields">
-                            <span class="whitespace-no-wrap text-left">
+                        <td v-for="field in fields"
+                            class="whitespace-no-wrap text-left">
+                            <template v-if="Array.isArray(route[field.attribute])">
+                                    <span v-for="value in route[field.attribute]"
+                                          :class="{
+                                            'px-2 py-1 text-white text-xs font-semibold rounded mr-2': ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(value),
+                                            'bg-success': value === 'GET',
+                                            'bg-80': value === 'HEAD',
+                                            'bg-primary-dark': value === 'POST',
+                                            'bg-warning': value === 'PUT',
+                                            'bg-info': value === 'PATCH',
+                                            'bg-danger': value === 'DELETE',
+                                        }">
+                                        {{ value }}
+                                    </span>
+                            </template>
+                            <template v-else>
                                 {{ route[field.attribute] }}
-                            </span>
+                            </template>
                         </td>
                     </tr>
                     </tbody>
