@@ -28,13 +28,13 @@
                 <td class="whitespace-no-wrap text-left">
                     <span v-for="value in route.methods"
                           :class="{
-                            'px-2 py-1 text-white text-xs font-semibold rounded mr-2': ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(value),
-                            'bg-success': value === 'GET',
-                            'bg-80': value === 'HEAD',
-                            'bg-primary-dark': value === 'POST',
-                            'bg-warning': value === 'PUT',
-                            'bg-info': value === 'PATCH',
-                            'bg-danger': value === 'DELETE',
+                            'px-2 py-1 text-xs font-semibold rounded mr-2': ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(value),
+                            'bg-success text-white': value === 'GET',
+                            'bg-80 text-white': value === 'HEAD',
+                            'bg-primary-dark text-white': value === 'POST',
+                            'bg-warning text-90': value === 'PUT',
+                            'bg-info text-white': value === 'PATCH',
+                            'bg-danger text-white': value === 'DELETE',
                         }"
                     >
                         {{ value }}
@@ -45,11 +45,8 @@
                 </td>
                 <td class="whitespace-no-wrap text-left">
                     <span v-for="value in route.middleware"
-                          class="px-2 py-1 text-white text-xs font-semibold rounded mr-2"
-                          :class="{
-                            'bg-primary-dark': ! value.toLowerCase().includes('nova'),
-                            'bg-80': value.toLowerCase().includes('nova'),
-                          }"
+                          class="px-2 py-1 text-xs font-semibold rounded mr-2"
+                          :class="style(value)"
                     >
                         {{ value }}
                     </span>
@@ -61,6 +58,35 @@
 </template>
 
 <script>
+const StyleGenerator = (() => {
+    let styleIndex = 0;
+    let usedStyles = {};
+    const styles = [
+        'bg-success text-white',
+        'bg-80 text-white',
+        'bg-primary-dark text-white',
+        'bg-warning text-90',
+        'bg-info text-white',
+        'bg-danger text-white',
+    ];
+
+    return {
+        generate: function(value) {
+            if (styleIndex >= styles.length) {
+                styleIndex = 0;
+            }
+
+            if (! usedStyles.hasOwnProperty(value)) {
+                usedStyles[value] = styles[styleIndex];
+            }
+
+            styleIndex++;
+
+            return usedStyles[value];
+        }
+    };
+})();
+
 export default {
     data() {
         return {
@@ -95,6 +121,11 @@ export default {
         },
         sort: {
             type: Function,
+        }
+    },
+    methods: {
+        style(value) {
+            return StyleGenerator.generate(value);
         }
     }
 }
