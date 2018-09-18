@@ -6,99 +6,55 @@
             <div class="relative h-9 flex items-center mb-6">
                 <icon type="search" class="absolute ml-3 text-70" />
 
-                <input
-                    class="appearance-none form-control form-input w-search pl-search"
-                    placeholder="Search"
-                    type="search"
-                    v-model="search"
+                <input v-model="search"
+                       class="appearance-none form-control form-input w-search pl-search"
+                       placeholder="Search"
+                       type="search"
                 >
             </div>
 
+            <div class="flex items-center mb-6 ml-6">
+                <checkbox :checked="showNova"
+                          @input="toggleNova"
+                />
+                <label class="cursor-pointer pl-2"
+                       @click="toggleNova"
+                >
+                    Show Nova routes
+                </label>
+            </div>
+
             <span class="ml-auto mb-6">
-                <button @click="getRoutes()" class="btn btn-default btn-primary">
+                <button @click="getRoutes()"
+                        class="btn btn-default btn-primary"
+                >
                     Refresh
                 </button>
             </span>
         </div>
 
         <card>
-            <div class="overflow-hidden overflow-x-auto relative">
-                <table class="table w-full" cellpadding="0" cellspacing="0">
-                    <thead>
-                    <tr>
-                        <th v-for="field in fields" class="text-left">
-                            <sortable-icon
-                                    @sort="sortBy(field)"
-                                    :resource-name="resourceName"
-                                    :uri-key="field.attribute"
-                            >
-                                {{ field.label }}
-                            </sortable-icon>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(route, index) in filteredRoutes" :key="index">
-                        <td v-for="field in fields"
-                            class="whitespace-no-wrap text-left">
-                            <template v-if="Array.isArray(route[field.attribute])">
-                                    <span v-for="value in route[field.attribute]"
-                                          :class="{
-                                            'px-2 py-1 text-white text-xs font-semibold rounded mr-2': ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(value),
-                                            'bg-success': value === 'GET',
-                                            'bg-80': value === 'HEAD',
-                                            'bg-primary-dark': value === 'POST',
-                                            'bg-warning': value === 'PUT',
-                                            'bg-info': value === 'PATCH',
-                                            'bg-danger': value === 'DELETE',
-                                        }">
-                                        {{ value }}
-                                    </span>
-                            </template>
-                            <template v-else>
-                                {{ route[field.attribute] }}
-                            </template>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <route-table :routes="filteredRoutes"
+                         :sort="sortBy"
+            ></route-table>
         </card>
     </div>
 </template>
 
 <script>
+import RouteTable from './RouteTable';
+
 export default {
+    components: { RouteTable },
     data() {
         return {
-            fields: [
-                {
-                    label: 'Route',
-                    attribute: 'uri',
-                },
-                {
-                    label: 'Name',
-                    attribute: 'as',
-                },
-                {
-                    label: 'Methods',
-                    attribute: 'methods',
-                },
-                {
-                    label: 'Action',
-                    attribute: 'action',
-                },
-                {
-                    label: 'Middleware',
-                    attribute: 'middleware',
-                }
-            ],
             routes: [],
             search: '',
             sort: {
                 field: '',
                 order: -1,
             },
+            showNova: false,
         }
     },
     mounted() {
@@ -111,7 +67,7 @@ export default {
             });
         },
         sortBy(field) {
-            this.sort.field = field.attribute;
+            this.sort.field = field;
             this.sort.order *= -1;
 
             this.routes.sort((route1, route2) => {
@@ -126,11 +82,14 @@ export default {
                 return comparison * this.sort.order;
             });
         },
+        toggleNova() {
+            this.showNova = ! this.showNova;
+        }
     },
     computed: {
         filteredRoutes() {
             if (! this.search.length) {
-                return this.routes;
+                return this.visibleRoutes;
             }
 
             const regex = this.searchRegex;
@@ -139,7 +98,7 @@ export default {
                 return {};
             }
 
-            return this.routes.filter(route => {
+            return this.visibleRoutes.filter(route => {
                 let matchesSearch = false;
 
                 for (let key in route) {
@@ -156,6 +115,17 @@ export default {
                 }
 
                 return matchesSearch;
+            });
+        },
+        visibleRoutes() {
+            if (this.showNova) {
+                return this.routes;
+            }
+
+            return this.routes.filter(route => {
+                return (! route.action.length || route.action.indexOf('Laravel\\Nova') !== 0)
+                    && (! route.as.length || route.as.indexOf('nova') !== 0)
+                    && ! route.middleware.includes('nova');
             });
         },
         searchRegex() {
