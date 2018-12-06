@@ -13,21 +13,26 @@ class Api
      */
     public function getRoutes()
     {
-	    $routes = collect(Route::getRoutes())->map(function ($route, $index) {
-	        $routeName = $route->action['as'] ?? '';
-	        if (ends_with($routeName, '.')) {
-	            $routeName = '';
-	        }
+        $routes = collect(Route::getRoutes())->map(function ($route, $index) {
+            $routeName = $route->action['as'] ?? '';
+            if (ends_with($routeName, '.')) {
+                $routeName = '';
+            }
 
-	        return [
-	            'uri' => $route->uri,
-	            'as' => $routeName,
-	            'methods' => $route->methods,
-	            'action' => $route->action['uses'] ?? '',
-	            'middleware' => $route->action['middleware'] ?? [],
-	        ];
-	    });
+            $routeMiddleware = $route->action['middleware'] ?? [];
+            if (! is_array($routeMiddleware)) {
+                $routeMiddleware = [$routeMiddleware];
+            }
 
-	    return response()->json($routes);
+            return [
+                'uri' => $route->uri,
+                'as' => $routeName,
+                'methods' => $route->methods,
+                'action' => $route->action['uses'] ?? '',
+                'middleware' => $routeMiddleware,
+            ];
+        });
+
+        return response()->json($routes);
     }
 }
