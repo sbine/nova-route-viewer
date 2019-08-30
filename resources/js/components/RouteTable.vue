@@ -9,7 +9,7 @@
                         :resource-name="resourceName"
                         :uri-key="field.attribute"
                     >
-                        {{ field.label }}
+                        {{ __(field.label) }}
                     </sortable-icon>
                 </th>
             </tr>

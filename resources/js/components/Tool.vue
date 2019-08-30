@@ -8,7 +8,7 @@
 
                 <input v-model="search"
                        class="appearance-none form-control form-input w-search pl-search"
-                       placeholder="Search"
+                       :placeholder="__('Search')"
                        type="search"
                 >
             </div>
@@ -20,7 +20,7 @@
                 <label class="cursor-pointer pl-2"
                        @click="toggleNova"
                 >
-                    Show Nova routes
+                    {{ __('Show Nova routes') }}
                 </label>
             </div>
 
@@ -28,7 +28,7 @@
                 <button @click="getRoutes()"
                         class="btn btn-default btn-primary"
                 >
-                    Refresh
+                    {{ __('Refresh') }}
                 </button>
             </span>
         </div>
