@@ -17,16 +17,7 @@ class ToolServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/sbine/route-viewer'),
-        ]);
-
-        Nova::translations(
-            resource_path('lang/vendor/sbine/route-viewer/'.app()->getLocale().'.json')
-        );
-
-        $this->loadJSONTranslationsFrom(__DIR__.'/../resources/lang');
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'route-viewer');
+        $this->registerTranslations();
 
         $this->app->booted(function () {
             $this->routes();
@@ -61,5 +52,17 @@ class ToolServiceProvider extends ServiceProvider
     public function register()
     {
         //
+    }
+
+    protected function registerTranslations()
+    {
+        $currentLocale = app()->getLocale();
+
+        Nova::translations(__DIR__.'/../resources/lang/'.$currentLocale.'.json');
+        Nova::translations(resource_path('lang/vendor/route-viewer/'.$currentLocale.'.json'));
+
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'route-viewer');
+        $this->loadJSONTranslationsFrom(__DIR__.'/../resources/lang');
+        $this->loadJSONTranslationsFrom(resource_path('lang/vendor/route-viewer'));
     }
 }
