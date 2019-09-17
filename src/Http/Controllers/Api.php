@@ -3,6 +3,7 @@
 namespace Sbine\RouteViewer\Http\Controllers;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class Api
 {
@@ -15,7 +16,7 @@ class Api
     {
         $routes = collect(Route::getRoutes())->map(function ($route, $index) {
             $routeName = $route->action['as'] ?? '';
-            if (ends_with($routeName, '.')) {
+            if (Str::endsWith($routeName, '.')) {
                 $routeName = '';
             }
 
