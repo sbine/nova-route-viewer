@@ -23,3 +23,9 @@ public function tools()
     ];
 }
 ```
+
+Publish translations:
+
+```
+php artisan vendor:publish --provider=Sbine\RouteViewer\ToolServiceProvider
+```
