@@ -2,6 +2,7 @@
 
 namespace Sbine\RouteViewer\Http\Middleware;
 
+use Laravel\Nova\Nova;
 use Sbine\RouteViewer\RouteViewer;
 
 class Authorize
@@ -15,6 +16,19 @@ class Authorize
      */
     public function handle($request, $next)
     {
-        return resolve(RouteViewer::class)->authorize($request) ? $next($request) : abort(403);
+        $tool = collect(Nova::registeredTools())->first([$this, 'matchesTool']);
+
+        return optional($tool)->authorize($request) ? $next($request) : abort(403);
+    }
+
+    /**
+     * Determine whether this tool belongs to the package.
+     *
+     * @param  \Laravel\Nova\Tool  $tool
+     * @return bool
+     */
+    public function matchesTool($tool)
+    {
+        return $tool instanceof RouteViewer;
     }
 }
