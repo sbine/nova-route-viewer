@@ -24,8 +24,8 @@ public function tools()
 }
 ```
 
-Publish translations:
+You can customize the translations by publishing them to your local folder `resources/lang/vendor/route-viewer`:
 
 ```
-php artisan vendor:publish --provider=Sbine\RouteViewer\ToolServiceProvider
+php artisan vendor:publish --provider="Sbine\RouteViewer\ToolServiceProvider"
 ```

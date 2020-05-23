@@ -6,27 +6,31 @@
             <div class="relative h-9 flex items-center mb-6">
                 <icon type="search" class="absolute ml-3 text-70" />
 
-                <input v-model="search"
-                       class="appearance-none form-control form-input w-search pl-search"
-                       :placeholder="__('Search')"
-                       type="search"
+                <input
+                    v-model="search"
+                    class="appearance-none form-control form-input w-search pl-search"
+                    :placeholder="__('Search')"
+                    type="search"
                 >
             </div>
 
             <div class="flex items-center mb-6 ml-6">
-                <checkbox :checked="showNova"
-                          @input="toggleNova"
+                <checkbox
+                    :checked="showNova"
+                    @input="toggleNova"
                 />
-                <label class="cursor-pointer pl-2"
-                       @click="toggleNova"
+                <label
+                    class="cursor-pointer pl-2"
+                    @click="toggleNova"
                 >
                     {{ __('Show Nova routes') }}
                 </label>
             </div>
 
             <span class="ml-auto mb-6">
-                <button @click="getRoutes()"
-                        class="btn btn-default btn-primary"
+                <button
+                    class="btn btn-default btn-primary"
+                    @click="getRoutes()"
                 >
                     {{ __('Refresh') }}
                 </button>
@@ -34,9 +38,10 @@
         </div>
 
         <card>
-            <route-table :routes="filteredRoutes"
-                         :sort="sortBy"
-            ></route-table>
+            <RouteTable
+                :routes="filteredRoutes"
+                :sort="sortBy"
+            />
         </card>
     </div>
 </template>
@@ -46,6 +51,7 @@ import RouteTable from './RouteTable';
 
 export default {
     components: { RouteTable },
+
     data() {
         return {
             routes: [],
@@ -57,13 +63,17 @@ export default {
             showNova: false,
         }
     },
+
     mounted() {
         this.getRoutes();
     },
+
     methods: {
         getRoutes() {
             Nova.request().get('/nova-vendor/route-viewer/routes').then(response => {
-                this.routes = response.data;
+                if (response.data) {
+                    this.routes = response.data;
+                }
             });
         },
         sortBy(field) {
@@ -86,6 +96,7 @@ export default {
             this.showNova = ! this.showNova;
         }
     },
+
     computed: {
         filteredRoutes() {
             if (! this.search.length) {
@@ -138,6 +149,3 @@ export default {
     }
 }
 </script>
-
-<style>
-</style>

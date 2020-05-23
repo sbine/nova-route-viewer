@@ -3,11 +3,15 @@
         <table class="table w-full" cellpadding="0" cellspacing="0">
             <thead>
             <tr>
-                <th v-for="field in fields" class="text-left">
+                <th
+                    v-for="(field, index) in fields"
+                    :key="index"
+                    class="text-left"
+                >
                     <sortable-icon
-                        @sort="sort(field.attribute)"
                         :resource-name="resourceName"
                         :uri-key="field.attribute"
+                        @sort="sort(field.attribute)"
                     >
                         {{ __(field.label) }}
                     </sortable-icon>
@@ -15,7 +19,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(route, index) in routes"
+            <tr
+                v-for="(route, index) in routes"
                 :key="index"
                 :route="route"
             >
@@ -26,8 +31,10 @@
                     {{ route.as }}
                 </td>
                 <td class="whitespace-no-wrap text-left">
-                    <span v-for="value in route.methods"
-                          :class="{
+                    <span
+                        v-for="(value, index) in route.methods"
+                        :key="index"
+                        :class="{
                             'px-2 py-1 text-xs font-semibold rounded mr-2': ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(value),
                             'bg-success text-white': value === 'GET',
                             'bg-80 text-white': value === 'HEAD',
@@ -44,9 +51,11 @@
                     {{ route.action }}
                 </td>
                 <td class="whitespace-no-wrap text-left">
-                    <span v-for="value in route.middleware"
-                          class="px-2 py-1 text-xs font-semibold rounded mr-2"
-                          :class="style(value)"
+                    <span
+                        v-for="(value, index) in route.middleware"
+                        :key="index"
+                        class="px-2 py-1 text-xs font-semibold rounded mr-2"
+                        :class="style(value)"
                     >
                         {{ value }}
                     </span>
@@ -88,6 +97,16 @@ const StyleGenerator = (() => {
 })();
 
 export default {
+    props: {
+        routes: {
+            type: Array,
+            required: true,
+        },
+        sort: {
+            type: Function,
+        }
+    },
+
     data() {
         return {
             fields: [
@@ -114,15 +133,7 @@ export default {
             ],
         };
     },
-    props: {
-        routes: {
-            type: Array,
-            required: true,
-        },
-        sort: {
-            type: Function,
-        }
-    },
+
     methods: {
         style(value) {
             return StyleGenerator.generate(value);
