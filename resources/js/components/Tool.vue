@@ -50,6 +50,11 @@
 import RouteTable from './RouteTable';
 
 export default {
+    metaInfo() {
+      return {
+        title: 'Route Viewer'
+      }
+    },
     components: { RouteTable },
 
     data() {
