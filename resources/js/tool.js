@@ -1,9 +1,7 @@
-Nova.booting((Vue, router) => {
-    router.addRoutes([
-        {
-            name: 'route-viewer',
-            path: '/route-viewer',
-            component: require('./components/Tool'),
-        },
-    ])
+import Tool from './components/Tool'
+import RouteViewerIcon from './components/icons/RouteViewer'
+
+Nova.booting((app, store) => {
+    Nova.inertia('RouteViewer', Tool)
+    app.component('heroicons-outline-route-viewer', RouteViewerIcon)
 })
