@@ -6,4 +6,4 @@ mix
     .setPublicPath('dist')
     .js('resources/js/tool.js', 'js')
     .vue({ version: 3 })
-    .nova('sbin/route-viewer')
+    .nova('sbine/route-viewer')
