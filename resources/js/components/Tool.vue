@@ -80,13 +80,18 @@ export default {
 
     methods: {
         getRoutes() {
-            this.isLoading = true
-            Nova.request().get('/nova-vendor/route-viewer/routes').then(response => {
-                if (response.data) {
-                    this.routes = response.data;
-                }
-            });
-            this.isLoading = false
+            this.isLoading = true;
+
+            Nova.request().get('/nova-vendor/route-viewer/routes')
+                .then(response => {
+                    if (response.data) {
+                        this.routes = response.data;
+                    }
+                })
+                .catch(error => Nova.error(error.message))
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
 
         sortBy(field) {
