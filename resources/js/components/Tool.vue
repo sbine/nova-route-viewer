@@ -16,7 +16,7 @@
                 >
             </div>
 
-            <div class="flex items-center ml-4">
+            <div class="flex items-center ml-3">
                 <checkbox
                     :checked="showNova"
                     @input="toggleNova"
