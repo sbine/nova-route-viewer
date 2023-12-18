@@ -16,7 +16,7 @@
                 >
             </div>
 
-            <div class="flex items-center ml-4">
+            <div class="flex items-center ml-3">
                 <checkbox
                     :checked="showNova"
                     @input="toggleNova"
@@ -26,6 +26,32 @@
                     @click="toggleNova"
                 >
                     {{ __('Show Nova routes') }}
+                </label>
+            </div>
+
+            <div class="flex items-center ml-3">
+                <checkbox
+                    :checked="showPassport"
+                    @input="togglePassport"
+                />
+              <label
+                  class="cursor-pointer ml-2"
+                  @click="togglePassport"
+              >
+                  {{ __('Show Passport routes') }}
+                </label>
+            </div>
+
+            <div class="flex items-center ml-3">
+                <checkbox
+                    :checked="showHorizon"
+                    @input="toggleHorizon"
+                />
+                <label
+                    class="cursor-pointer ml-2"
+                    @click="toggleHorizon"
+                >
+                    {{ __('Show Horizon routes') }}
                 </label>
             </div>
 
@@ -71,6 +97,8 @@ export default {
                 order: -1,
             },
             showNova: false,
+            showPassport: false,
+            showHorizon: false,
         }
     },
 
@@ -80,13 +108,18 @@ export default {
 
     methods: {
         getRoutes() {
-            this.isLoading = true
-            Nova.request().get('/nova-vendor/route-viewer/routes').then(response => {
-                if (response.data) {
-                    this.routes = response.data;
-                }
-            });
-            this.isLoading = false
+            this.isLoading = true;
+
+            Nova.request().get('/nova-vendor/route-viewer/routes')
+                .then(response => {
+                    if (response.data) {
+                        this.routes = response.data;
+                    }
+                })
+                .catch(error => Nova.error(error.message))
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
 
         sortBy(field) {
@@ -108,7 +141,35 @@ export default {
 
         toggleNova() {
             this.showNova = ! this.showNova;
-        }
+        },
+
+        togglePassport() {
+            this.showPassport = ! this.showPassport;
+        },
+
+        toggleHorizon() {
+            this.showHorizon = ! this.showHorizon;
+        },
+
+        belongsToNova(route) {
+            return route.middleware.includes('nova')
+                || route.middleware.includes('nova:api')
+                || (typeof route.action === 'string' && route.action.startsWith('Laravel\\Nova'));
+        },
+
+        belongsToPassport(route) {
+            if (typeof route.action === 'string') {
+              return route.action.startsWith('Laravel\\Passport');
+            }
+            return false;
+        },
+
+        belongsToHorizon(route) {
+            if (typeof route.action === 'string') {
+              return route.action.startsWith('Laravel\\Horizon');
+            }
+            return false;
+        },
     },
 
     computed: {
@@ -144,15 +205,21 @@ export default {
         },
 
         visibleRoutes() {
-            if (this.showNova) {
-                return this.routes;
+            let filteredRoutes = this.routes;
+
+            if (! this.showNova) {
+                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToNova(route));
             }
 
-            return this.routes.filter(route => {
-                return (! route.action.length || route.action.indexOf('Laravel\\Nova') !== 0)
-                    && (! route.as.length || route.as.indexOf('nova') !== 0)
-                    && ! route.middleware.includes('nova');
-            });
+            if (! this.showPassport) {
+                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToPassport(route));
+            }
+
+            if (! this.showHorizon) {
+                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToHorizon(route));
+            }
+
+            return filteredRoutes;
         },
 
         searchRegex() {
