@@ -16,6 +16,20 @@
                 >
             </div>
 
+            <div class="relative h-9 flex items-center ml-3 mr-1">
+                <label for="http-method-filter" class="cursor-pointer ml-2">{{ __('Filter by HTTP Method') }}</label>
+                <select id="http-method-filter" v-model="selectedHttpMethod" class="border rounded p-1">
+                    <option value="all">All</option>
+                    <option value="GET">GET</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+
             <div class="flex items-center ml-3">
                 <checkbox
                     :checked="showNova"
@@ -99,6 +113,7 @@ export default {
             showNova: false,
             showPassport: false,
             showHorizon: false,
+            selectedHttpMethod: 'all',
         }
     },
 
@@ -206,6 +221,10 @@ export default {
 
         visibleRoutes() {
             let filteredRoutes = this.routes;
+
+            if (this.selectedHttpMethod !== 'all') {
+                filteredRoutes = filteredRoutes.filter(route => route.methods && route.methods.includes(this.selectedHttpMethod));
+            }
 
             if (! this.showNova) {
                 filteredRoutes = filteredRoutes.filter(route => ! this.belongsToNova(route));
