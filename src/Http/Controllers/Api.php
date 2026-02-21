@@ -29,7 +29,7 @@ class Api
                 'uri' => $route->uri,
                 'as' => $routeName,
                 'methods' => $route->methods,
-                'action' => $route->action['uses'] ?? '',
+                'action' => $route->action['uses'] instanceof \Closure ? 'Closure' : ($route->action['uses'] ?? ''),
                 'middleware' => $routeMiddleware,
             ];
         });
