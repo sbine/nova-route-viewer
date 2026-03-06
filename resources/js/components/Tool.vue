@@ -83,6 +83,7 @@
             <Card>
                 <RouteTable
                     :routes="filteredRoutes"
+                    :columns="columns"
                     :sort="sortBy"
                 />
             </Card>
@@ -105,6 +106,7 @@ export default {
         return {
             isLoading: true,
             routes: [],
+            columns: [],
             search: '',
             sort: {
                 field: '',
@@ -128,7 +130,8 @@ export default {
             Nova.request().get('/nova-vendor/route-viewer/routes')
                 .then(response => {
                     if (response.data) {
-                        this.routes = response.data;
+                        this.columns = response.data.columns;
+                        this.routes = response.data.routes;
                     }
                 })
                 .catch(error => Nova.error(error.message))
