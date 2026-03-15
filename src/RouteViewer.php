@@ -9,6 +9,28 @@ use Laravel\Nova\Tool;
 
 class RouteViewer extends Tool
 {
+    protected static array $columns = [];
+
+    public static function addColumn(Column $column): void
+    {
+        static::$columns[] = $column;
+    }
+
+    public static function addColumns(Column ...$columns): void
+    {
+        array_push(static::$columns, ...$columns);
+    }
+
+    public static function getColumns(): array
+    {
+        return static::$columns;
+    }
+
+    public static function flushColumns(): void
+    {
+        static::$columns = [];
+    }
+
     /**
      * Perform any tasks that need to happen when the tool is booted.
      *
