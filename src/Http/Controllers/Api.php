@@ -28,11 +28,13 @@ class Api
                 $routeMiddleware = [$routeMiddleware];
             }
 
+            $action = $route->action['uses'] ?? '';
+
             return [
                 'uri' => $route->uri,
                 'as' => $routeName,
                 'methods' => $route->methods,
-                'action' => is_string($route->action['uses'] ?? '') ? ($route->action['uses'] ?? '') : 'Closure',
+                'action' => is_string($action) ? $action : 'Closure',
                 'middleware' => $routeMiddleware,
             ];
         })->values()->all();
