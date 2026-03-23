@@ -32,7 +32,7 @@ class Api
                 'uri' => $route->uri,
                 'as' => $routeName,
                 'methods' => $route->methods,
-                'action' => $route->action['uses'] instanceof \Closure ? 'Closure' : ($route->action['uses'] ?? ''),
+                'action' => is_string($route->action['uses'] ?? '') ? ($route->action['uses'] ?? '') : 'Closure',
                 'middleware' => $routeMiddleware,
             ];
         })->values()->all();
