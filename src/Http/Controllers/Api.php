@@ -16,8 +16,9 @@ class Api
     public function getRoutes()
     {
         $rawRoutes = collect(Route::getRoutes());
+        $filters = RouteViewer::getFilters();
 
-        $routes = $rawRoutes->map(function ($route) {
+        $routes = $rawRoutes->map(function ($route) use ($filters) {
             $routeName = $route->action['as'] ?? '';
             if (Str::endsWith($routeName, '.')) {
                 $routeName = '';
@@ -30,12 +31,20 @@ class Api
 
             $action = $route->action['uses'] ?? '';
 
+            $matchedFilters = [];
+            foreach ($filters as $filter) {
+                if ($filter->matches($route)) {
+                    $matchedFilters[] = $filter->label;
+                }
+            }
+
             return [
                 'uri' => $route->uri,
                 'as' => $routeName,
                 'methods' => $route->methods,
                 'action' => is_string($action) ? $action : 'Closure',
                 'middleware' => $routeMiddleware,
+                'matchedFilters' => $matchedFilters,
             ];
         })->values()->all();
 
@@ -59,6 +68,7 @@ class Api
         return response()->json([
             'columns' => $columns,
             'routes' => $routes,
+            'filters' => array_map(fn ($filter) => $filter->toArray(), $filters),
         ]);
     }
 

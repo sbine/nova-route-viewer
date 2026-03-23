@@ -11,6 +11,9 @@ class RouteViewer extends Tool
 {
     protected static array $columns = [];
 
+    /** @var Filter[] */
+    protected static array $filters = [];
+
     public static function addColumn(Column $column): void
     {
         static::$columns[] = $column;
@@ -29,6 +32,27 @@ class RouteViewer extends Tool
     public static function flushColumns(): void
     {
         static::$columns = [];
+    }
+
+    public static function addFilter(Filter $filter): void
+    {
+        static::$filters[] = $filter;
+    }
+
+    public static function addFilters(Filter ...$filters): void
+    {
+        array_push(static::$filters, ...$filters);
+    }
+
+    /** @return Filter[] */
+    public static function getFilters(): array
+    {
+        return static::$filters;
+    }
+
+    public static function flushFilters(): void
+    {
+        static::$filters = [];
     }
 
     /**

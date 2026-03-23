@@ -30,42 +30,20 @@
                 </select>
             </div>
 
-            <div class="flex items-center ml-3">
+            <div
+                v-for="filter in filters"
+                :key="filter.label"
+                class="flex items-center ml-3"
+            >
                 <checkbox
-                    :checked="showNova"
-                    @input="toggleNova"
+                    :checked="filterState[filter.label] || false"
+                    @input="toggleFilter(filter.label)"
                 />
                 <label
                     class="cursor-pointer ml-2"
-                    @click="toggleNova"
+                    @click="toggleFilter(filter.label)"
                 >
-                    {{ __('Show Nova routes') }}
-                </label>
-            </div>
-
-            <div class="flex items-center ml-3">
-                <checkbox
-                    :checked="showPassport"
-                    @input="togglePassport"
-                />
-              <label
-                  class="cursor-pointer ml-2"
-                  @click="togglePassport"
-              >
-                  {{ __('Show Passport routes') }}
-                </label>
-            </div>
-
-            <div class="flex items-center ml-3">
-                <checkbox
-                    :checked="showHorizon"
-                    @input="toggleHorizon"
-                />
-                <label
-                    class="cursor-pointer ml-2"
-                    @click="toggleHorizon"
-                >
-                    {{ __('Show Horizon routes') }}
+                    {{ __('Show :name routes', { name: filter.label }) }}
                 </label>
             </div>
 
@@ -107,14 +85,13 @@ export default {
             isLoading: true,
             routes: [],
             columns: [],
+            filters: [],
+            filterState: {},
             search: '',
             sort: {
                 field: '',
                 order: -1,
             },
-            showNova: false,
-            showPassport: false,
-            showHorizon: false,
             selectedHttpMethod: 'all',
         }
     },
@@ -132,6 +109,18 @@ export default {
                     if (response.data) {
                         this.columns = response.data.columns;
                         this.routes = response.data.routes;
+
+                        if (response.data.filters) {
+                            this.filters = response.data.filters;
+                            const newState = {};
+                            this.filters.forEach(filter => {
+                                // Preserve existing toggle state on refresh, otherwise use default
+                                newState[filter.label] = filter.label in this.filterState
+                                    ? this.filterState[filter.label]
+                                    : ! filter.hiddenByDefault;
+                            });
+                            this.filterState = newState;
+                        }
                     }
                 })
                 .catch(error => Nova.error(error.message))
@@ -157,36 +146,11 @@ export default {
             });
         },
 
-        toggleNova() {
-            this.showNova = ! this.showNova;
-        },
-
-        togglePassport() {
-            this.showPassport = ! this.showPassport;
-        },
-
-        toggleHorizon() {
-            this.showHorizon = ! this.showHorizon;
-        },
-
-        belongsToNova(route) {
-            return route.middleware.includes('nova')
-                || route.middleware.includes('nova:api')
-                || (typeof route.action === 'string' && route.action.startsWith('Laravel\\Nova'));
-        },
-
-        belongsToPassport(route) {
-            if (typeof route.action === 'string') {
-              return route.action.startsWith('Laravel\\Passport');
-            }
-            return false;
-        },
-
-        belongsToHorizon(route) {
-            if (typeof route.action === 'string') {
-              return route.action.startsWith('Laravel\\Horizon');
-            }
-            return false;
+        toggleFilter(label) {
+            this.filterState = {
+                ...this.filterState,
+                [label]: ! this.filterState[label],
+            };
         },
     },
 
@@ -206,6 +170,8 @@ export default {
                 let matchesSearch = false;
 
                 for (let key in route) {
+                    if (key === 'matchedFilters') continue;
+
                     if (Array.isArray(route[key])) {
                         route[key].forEach(property => {
                             if (regex.test(property)) {
@@ -229,17 +195,14 @@ export default {
                 filteredRoutes = filteredRoutes.filter(route => route.methods && route.methods.includes(this.selectedHttpMethod));
             }
 
-            if (! this.showNova) {
-                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToNova(route));
-            }
+            // Apply custom filters: hide routes matching a filter whose toggle is off
+            filteredRoutes = filteredRoutes.filter(route => {
+                if (! route.matchedFilters || route.matchedFilters.length === 0) {
+                    return true;
+                }
 
-            if (! this.showPassport) {
-                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToPassport(route));
-            }
-
-            if (! this.showHorizon) {
-                filteredRoutes = filteredRoutes.filter(route => ! this.belongsToHorizon(route));
-            }
+                return route.matchedFilters.every(label => this.filterState[label]);
+            });
 
             return filteredRoutes;
         },

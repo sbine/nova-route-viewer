@@ -67,6 +67,43 @@ RouteViewer::addColumn(
 
 Custom columns are automatically searchable and sortable. Use `->sortable(false)` to opt out of sorting.
 
+## Custom Filters
+
+You can register custom route filters that add toggle checkboxes to the toolbar. Routes matching a filter are hidden by default; clicking the checkbox reveals them.
+
+```php
+use Sbine\RouteViewer\RouteViewer;
+use Sbine\RouteViewer\Filter;
+
+// Hide Nova routes by default (checkbox toggles visibility)
+RouteViewer::addFilter(
+    Filter::make('Nova', function (\Illuminate\Routing\Route $route) {
+        $middleware = (array) ($route->action['middleware'] ?? []);
+        $action = $route->action['uses'] ?? '';
+
+        return in_array('nova', $middleware)
+            || in_array('nova:api', $middleware)
+            || (is_string($action) && str_starts_with($action, 'Laravel\\Nova'));
+    })
+);
+
+// Hide Horizon routes by default
+RouteViewer::addFilter(
+    Filter::make('Horizon', fn (\Illuminate\Routing\Route $route) =>
+        is_string($route->action['uses'] ?? '') && str_starts_with($route->action['uses'], 'Laravel\\Horizon')
+    )
+);
+
+// Show Sanctum routes by default (opt-in visibility)
+RouteViewer::addFilter(
+    Filter::make('Sanctum', fn (\Illuminate\Routing\Route $route) =>
+        is_string($route->action['uses'] ?? '') && str_starts_with($route->action['uses'], 'Laravel\\Sanctum')
+    )->shownByDefault()
+);
+```
+
+Filters replace the previously hardcoded Nova/Passport/Horizon checkboxes. Register your own in `NovaServiceProvider` or `AppServiceProvider`.
+
 ## Contributing
 
 After updating frontend assets, rebuild for production:
