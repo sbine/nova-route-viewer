@@ -16,6 +16,7 @@
     "homepage": "https://github.com/sbine/nova-route-viewer",
     "require": {
         "php": "^8.0",
+        "laravel/framework": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
         "laravel/nova": "^4.0 || ^5.0"
     },
     "repositories": [
