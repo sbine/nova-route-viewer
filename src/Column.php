@@ -8,9 +8,13 @@ use Illuminate\Routing\Route;
 class Column
 {
     public string $label;
+
     public string $attribute;
+
     public bool $sortable = true;
+
     protected ?Closure $resolver = null;
+
     protected ?Closure $batchResolver = null;
 
     protected function __construct(string $label, string $attribute)
