@@ -2,6 +2,7 @@
 
 namespace Sbine\RouteViewer\Tests;
 
+use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 use Sbine\RouteViewer\Column;
 
@@ -44,7 +45,7 @@ class ColumnTest extends TestCase
         $column = Column::make('Domain', 'domain')
             ->using(fn ($route) => $route->getDomain());
 
-        $route = new \Illuminate\Routing\Route('GET', 'test', fn () => null);
+        $route = new Route('GET', 'test', fn () => null);
 
         $this->assertNull($column->resolve($route));
     }
@@ -75,7 +76,7 @@ class ColumnTest extends TestCase
     {
         $column = Column::make('Label', 'attr');
 
-        $route = new \Illuminate\Routing\Route('GET', 'test', fn () => null);
+        $route = new Route('GET', 'test', fn () => null);
 
         $this->assertNull($column->resolve($route));
     }

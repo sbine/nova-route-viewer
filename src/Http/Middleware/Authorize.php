@@ -2,7 +2,10 @@
 
 namespace Sbine\RouteViewer\Http\Middleware;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Tool;
 use Sbine\RouteViewer\RouteViewer;
 
 class Authorize
@@ -10,9 +13,9 @@ class Authorize
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  \Closure  $next
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function handle($request, $next)
     {
@@ -24,7 +27,7 @@ class Authorize
     /**
      * Determine whether this tool belongs to the package.
      *
-     * @param  \Laravel\Nova\Tool  $tool
+     * @param  Tool  $tool
      * @return bool
      */
     public function matchesTool($tool)

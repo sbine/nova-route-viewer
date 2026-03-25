@@ -4,6 +4,7 @@ namespace Sbine\RouteViewer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Sbine\RouteViewer\Column;
+use Sbine\RouteViewer\RouteViewer;
 
 /**
  * These tests require laravel/nova to be installed.
@@ -14,23 +15,23 @@ class RouteViewerTest extends TestCase
 {
     protected function tearDown(): void
     {
-        \Sbine\RouteViewer\RouteViewer::flushColumns();
+        RouteViewer::flushColumns();
         parent::tearDown();
     }
 
     public function test_it_starts_with_no_custom_columns(): void
     {
-        $this->assertSame([], \Sbine\RouteViewer\RouteViewer::getColumns());
+        $this->assertSame([], RouteViewer::getColumns());
     }
 
     public function test_it_can_add_a_single_column(): void
     {
         $column = Column::make('Domain', 'domain');
 
-        \Sbine\RouteViewer\RouteViewer::addColumn($column);
+        RouteViewer::addColumn($column);
 
-        $this->assertCount(1, \Sbine\RouteViewer\RouteViewer::getColumns());
-        $this->assertSame($column, \Sbine\RouteViewer\RouteViewer::getColumns()[0]);
+        $this->assertCount(1, RouteViewer::getColumns());
+        $this->assertSame($column, RouteViewer::getColumns()[0]);
     }
 
     public function test_it_can_add_multiple_columns(): void
@@ -38,19 +39,19 @@ class RouteViewerTest extends TestCase
         $col1 = Column::make('Domain', 'domain');
         $col2 = Column::make('Rate Limit', 'rate_limit');
 
-        \Sbine\RouteViewer\RouteViewer::addColumns($col1, $col2);
+        RouteViewer::addColumns($col1, $col2);
 
-        $this->assertCount(2, \Sbine\RouteViewer\RouteViewer::getColumns());
+        $this->assertCount(2, RouteViewer::getColumns());
     }
 
     public function test_it_can_flush_columns(): void
     {
-        \Sbine\RouteViewer\RouteViewer::addColumn(Column::make('Domain', 'domain'));
+        RouteViewer::addColumn(Column::make('Domain', 'domain'));
 
-        $this->assertCount(1, \Sbine\RouteViewer\RouteViewer::getColumns());
+        $this->assertCount(1, RouteViewer::getColumns());
 
-        \Sbine\RouteViewer\RouteViewer::flushColumns();
+        RouteViewer::flushColumns();
 
-        $this->assertSame([], \Sbine\RouteViewer\RouteViewer::getColumns());
+        $this->assertSame([], RouteViewer::getColumns());
     }
 }

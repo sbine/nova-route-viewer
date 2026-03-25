@@ -39,5 +39,9 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
 
+      - name: Check code style
+        if: matrix.php == '8.4'
+        run: vendor/bin/pint --test
+
       - name: Run tests
         run: vendor/bin/phpunit

@@ -2,6 +2,7 @@
 
 namespace Sbine\RouteViewer\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Sbine\RouteViewer\RouteViewer;
@@ -11,7 +12,7 @@ class Api
     /**
      * Return all the registered routes.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getRoutes()
     {
